@@ -1,0 +1,47 @@
+Documento generado para AI Studio de Google
+Proyecto App Universal de Teclado/Ratón:
+- Bluetooth: teclado, ratón, cualquier dispositivo físico compatible.
+- Compatibilidad inicial: Linux, Mac, PC.
+- Alcance local (red).
+- La aplicación actúa como intermediaria convirtiéndose en teclado/ratón universal.
+- Implementar switch para activar/desconectar dispositivos de su host original.
+- Configuraciones mapeadas: para futuras iteraciones.
+Preguntas pendientes:
+1) ¿Registro y estado de dispositivos conectados?
+2) ¿Switch automático o manual?
+3) ¿Notificaciones emergentes para estados y conexión?
+- Registro de dispositivos conectados: Sí.
+- Gestión del switch: Pulsando una tecla (Control) o pasando el ratón por una esquina, dependiendo del dispositivo conectado. También podría haber una app maestra para cambiar configuraciones.
+- Notificaciones emergentes: Muy importante incluir para avisos de estado, conexión y usos.
+- Perfiles preconfigurados: Es posible.
+- Interfaz visual: Acceso organizado con diferentes funciones agrupadas en pantallas separadas para evitar saturación. Diseño enfocado en arquitectura limpia.
+- Seguridad: Requiere intervención directa del teclado/ratón conectado para emparejamiento o autenticación.
+- Actualizaciones: El usuario elegirá cuándo actualizar.
+- Estadísticas de uso: Podrían incluirse siempre que no sobrecarguen la app.
+- Sistema de permisos: Implementar si se considera necesario para limitar accesos avanzados o funciones específicas.
+- Activación: Funciona en segundo plano automáticamente.
+- Dispositivos conectados: Ilimitados.
+- Configuraciones: Exportables como JSON y posibilidad de guardarlas en Firebase.
+- Accesos rápidos: Serían útiles para moverse fácilmente entre los dispositivos donde esté instalada la app (ordenador, móvil, etc.).
+- Control por voz: Se deja como pendiente.
+- Consumo de batería/recursos: Pregunta pendiente de reformular.
+- Logs/Historial: Incluir para registrar acciones, especialmente útil en caso de error, y permitir enviarlos adjuntos por correo a info@apliarte.com.
+- Personalización visual: Incluir temas (claro/oscuro).
+- Soporte técnico/Guía: Incluir soporte técnico básico y guía rápida dentro de la app.
+- Accesibilidad: Sí, incluir opciones como teclas más grandes o lectura de texto en voz.
+- Notificaciones push: Sí, incluir alertas sobre dispositivos conectados/desconectados.
+- Escenario prioritario: Mostrar claramente que la app es creada por ApliArte.com, incluyendo botones como Ko-fi, PayPal y enlaces a los proyectos actuales en GitHub.
+- Multilenguaje: Soporte desde la primera versión para español e inglés.
+- Respaldo/Restauración: Sí, incluir opción de respaldar y restaurar configuraciones automáticamente.
+- Análisis de rendimiento: Sí, para medir velocidad de conexiones y consumo de recursos.
+
+
+# Actualizaciones basadas en nuevas decisiones:
+
+4. Consumo de recursos:
+• Optimización de uso de batería y CPU pendiente de BLE y reconexión bajo demanda.
+• Políticas de desconexión para dispositivos inactivos.
+
+5. Perfiles preconfigurados:
+• Perfiles localmente (JSON, almacenamiento simple).
+• Migración futura a Firebase para backups y sincronización automática.
