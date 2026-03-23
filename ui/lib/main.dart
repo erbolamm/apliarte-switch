@@ -1,0 +1,51 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'providers/app_state.dart';
+import 'services/ipc_service.dart';
+import 'screens/home_screen.dart';
+
+void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(
+    MultiProvider(
+      providers: [
+        Provider<IpcService>(
+          create: (_) => IpcService(),
+          dispose: (_, service) => service.disconnect(),
+        ),
+        ChangeNotifierProxyProvider<IpcService, AppState>(
+          create: (context) => AppState(context.read<IpcService>()),
+          update: (_, ipc, appState) => appState ?? AppState(ipc),
+        ),
+      ],
+      child: const ApliArteSwitchApp(),
+    ),
+  );
+}
+
+class ApliArteSwitchApp extends StatelessWidget {
+  const ApliArteSwitchApp({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'ApliArteSwitch',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        useMaterial3: true,
+        brightness: Brightness.dark, // Tema oscuro con colores ApliArte
+        scaffoldBackgroundColor: const Color(0xFF303030),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF5ECEF5), // Azul claro
+          brightness: Brightness.dark,
+          surface: const Color(0xFF00467B), // Azul oscuro
+          background: const Color(0xFF303030), // Gris oscuro
+          primary: const Color(0xFF5ECEF5),
+          secondary: const Color(0xFFE8955E), // Naranja
+        ),
+        fontFamily: 'Inter', // Fuente moderna y limpia
+      ),
+      home: const HomeScreen(),
+    );
+  }
+}

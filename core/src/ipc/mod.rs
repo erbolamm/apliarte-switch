@@ -61,20 +61,76 @@ pub struct PeerInfo {
     pub connected: bool,
 }
 
-/// Arranca el servidor IPC.
-/// Javier: Es como iniciar un servidor local — Flutter lo conectará
-/// para recibir estado en tiempo real y enviar comandos.
-pub async fn serve(_event_tx: Sender<InputEvent>, _cfg: AppConfig) -> Result<()> {
-    tracing::info!("🔌 Servidor IPC arrancado — esperando conexión de la UI Flutter");
+use tokio::net::TcpListener;
+use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
 
-    // Javier: Usamos interprocess para crear el socket local de forma cross-platform
-    // En macOS/Linux: /tmp/apliarte-switch.sock
-    // En Windows: \\.\pipe\apliarte-switch
-    //
-    // TODO Fase 2: Implementar el listener completo con interprocess::LocalSocketListener
-    // Por ahora el servidor IPC hace loop vacío para no bloquear el select! de main.rs
+/// Arranca el servidor IPC por TCP local (Loopback).
+/// Javier: Es el backend de nuestra UI. Se levanta en el puerto cerrado 4243 (solo accesible desde este Mac).
+pub async fn serve(_event_tx: Sender<InputEvent>, _cfg: AppConfig) -> Result<()> {
+    let listener = TcpListener::bind("127.0.0.1:4243").await?;
+    tracing::info!("🔌 Servidor IPC escuchando en 127.0.0.1:4243");
 
     loop {
-        tokio::time::sleep(tokio::time::Duration::from_secs(60)).await;
+        // Javier: accept() bloquea hasta que Flutter (nuestro front) se conecte
+        let (mut socket, peer_addr) = listener.accept().await?;
+        tracing::info!("📱 UI Flutter conectada desde {:?}", peer_addr);
+
+        // Cada conexión de UI se maneja en un hilo independiente
+        tokio::spawn(async move {
+            let (reader, mut writer) = socket.split();
+            let mut buf_reader = BufReader::new(reader);
+            let mut line = String::new();
+
+            // 1. Al conectar, enviamos a la UI nuestro status actual: Todo OK!
+            let status = UiResponse::Status {
+                running: true,
+                active_peer: None,
+                peers: vec![],
+            };
+            
+            if let Ok(json) = serde_json::to_string(&status) {
+                let _ = writer.write_all(format!("{}\n", json).as_bytes()).await;
+            }
+
+            // 2. Loop para escuchar comandos de la UI
+            loop {
+                line.clear();
+                match buf_reader.read_line(&mut line).await {
+                    Ok(0) => {
+                        // EOF - La app de Flutter se cerró
+                        break;
+                    }
+                    Ok(_) => {
+                        // Javier: Parsear el JSON que mandó Flutter
+                        if let Ok(cmd) = serde_json::from_str::<UiCommand>(&line) {
+                            tracing::info!("⚡ Comando recibido de la UI: {:?}", cmd);
+                            
+                            // Si manda status, le devolvemos el status
+                            if let UiCommand::Status = cmd {
+                                let st = UiResponse::Status {
+                                    running: true,
+                                    active_peer: None,
+                                    peers: vec![],
+                                };
+                                if let Ok(resp) = serde_json::to_string(&st) {
+                                    let _ = writer.write_all(format!("{}\n", resp).as_bytes()).await;
+                                }
+                            } else {
+                                // Para otros comandos, solo confirmamos "Ok" de momento
+                                let ok = UiResponse::Ok;
+                                if let Ok(resp) = serde_json::to_string(&ok) {
+                                    let _ = writer.write_all(format!("{}\n", resp).as_bytes()).await;
+                                }
+                            }
+                        }
+                    }
+                    Err(e) => {
+                        tracing::warn!("Error leyendo del socket IPC: {}", e);
+                        break;
+                    }
+                }
+            }
+            tracing::info!("📱 UI Flutter desconectada");
+        });
     }
 }
