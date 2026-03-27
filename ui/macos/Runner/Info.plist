@@ -28,5 +28,9 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>Usamos Bluetooth para buscar dispositivos cercanos (ratón, teclado, cascos y mandos) en la red local.</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>Usamos Bluetooth para detectar y emparejar periféricos cercanos.</string>
 </dict>
 </plist>

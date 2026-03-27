@@ -45,3 +45,23 @@ Preguntas pendientes:
 5. Perfiles preconfigurados:
 • Perfiles localmente (JSON, almacenamiento simple).
 • Migración futura a Firebase para backups y sincronización automática.
+
+---
+
+# Actualización — 2026-03-27 (Estado + Estudio)
+
+## Avance en UI (Flutter)
+- Implementada una vista de **“Buscar conexiones cercanas”** en `ui/` accesible desde el botón de **Settings**.
+- La vista realiza **escaneo BLE** con `flutter_blue_plus` y muestra resultados filtrados por **RSSI** como aproximación de “radio corto”.
+- Se añadieron textos de uso en `ui/macos/Runner/Info.plist` para que macOS entienda el motivo del acceso Bluetooth.
+
+## Estudio / Observaciones (macOS)
+- En algunos casos, el sistema **no solicita el prompt de permisos** si faltan *entitlements* de Bluetooth.
+- Para corregirlo, se añadieron entitlements de Bluetooth en:
+  - `ui/macos/Runner/DebugProfile.entitlements`
+  - `ui/macos/Runner/Release.entitlements`
+
+## Estado funcional actual
+- El core Rust actual sigue enfocado en comunicación **por red local (LAN/UDP)** e inyección de input.
+- La parte de “switch” basada en dispositivos Bluetooth (pairing/autenticación + enrutado del input) **todavía no está implementada** extremo a extremo.
+

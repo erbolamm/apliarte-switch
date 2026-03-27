@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/app_state.dart';
 import '../models/ipc_models.dart';
+import 'device_scan_screen.dart';
 
 // Javier: Pantalla principal. Muestra los ordenadores como "tarjetas de cristal".
 // Analogía: Es un Row/Wrap donde cada Container es un PC.
@@ -62,7 +63,13 @@ class HomeScreen extends StatelessWidget {
           // Botón de ayuda / ajustes
           IconButton(
             icon: const Icon(Icons.settings_outlined, color: Colors.white54),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => const DeviceScanScreen(),
+                ),
+              );
+            },
           ),
           const SizedBox(height: 20),
         ],
